@@ -1,6 +1,7 @@
 from . import mongo_db
 import json
 from bson import ObjectId
+from . import query
 
 BOOK_COLLECTION = "books"
 
@@ -12,66 +13,25 @@ def collection():
 
 
 def find_by_id(id):
-    """
-    The function to return document for given objectId
-
-    Parameters:
-        id (ObjectId): document object id
-
-    Returns:
-        Dict: A Book document 
-    """
-
-    return collection().find_one({"_id": id})
+    return query.find_one(BOOK_COLLECTION, {"_id": id})
 
 
 def insert_one(data, document=True):
-    """
-    The function to insert new document
-
-    Parameters:
-        data (dict):  new book dict
-
-    Returns:
-        Dict: A Book document 
-    """
-
-    x = collection().insert_one(data)
-    book = x.inserted_id
-    if document:
-        book = find_by_id(x.inserted_id)
-
+    book = query.insert_one(BOOK_COLLECTION, data)
     return book
+
 
 def insert_many(data):
-    """
-    The function to insert many document
+    books = query.insert_one(BOOK_COLLECTION, data)
+    return books
 
-    Parameters:
-        data (dict):  new book dict
 
-    Returns:
-        Dict: A Book document 
-    """
+def find_all(query_dict, select_dict={}):
+    list_of_books = query.find_all(BOOK_COLLECTION, query_dict, select_dict)
+    return list_of_books
 
-    x = collection().insert_one(data)
-    book = find_by_id(x.inserted_id)
-    return book
 
-def find_all(query_dict):
-    """
-    The function to returns list of books 
-
-    Parameters:
-        query_dict (dict):  query dict to find data
-
-    Returns:
-        List: List of books
-    """
-
-    if "_id" in query_dict:
-        query_dict["_id"] = ObjectId(query_dict["_id"])
-
-    list_of_books = mongo_db.db[BOOK_COLLECTION].find(query_dict)
-    list_of_books = [each_book for each_book in list_of_books]
+def find_all_for_stream(query_dict, select_dict={}):
+    list_of_books = query.find_all_for_stream(
+        BOOK_COLLECTION, query_dict, select_dict)
     return list_of_books

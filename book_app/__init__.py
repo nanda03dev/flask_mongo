@@ -2,14 +2,18 @@ import os
 from flask import Flask
 
 from .database import mongo_db
-from .routes import *
-
+from os.path import join, dirname, realpath
+UPLOAD_FOLDER = 'uploads'
+UPLOADS_PATH = join(dirname(realpath(__file__)), UPLOAD_FOLDER)
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        SECRET_KEY='dev'
+        SECRET_KEY='dev',
+        UPLOAD_FOLDER = UPLOADS_PATH,
+        ALLOWED_EXTENSIONS = ALLOWED_EXTENSIONS
     )
 
     if test_config is None:
@@ -25,16 +29,18 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # mongo db initiation
-    mongo_db.start()
-    
-    # registering blueprints
-    app.register_blueprint(routes)
+    with app.app_context():
+        # mongo db initiation
+        mongo_db.start()
+        
+        from .routes import router
+        # registering blueprints
+        router.register(app)
 
-    # a simple page that says hello
+        # a simple page that says hello
 
-    @app.route('/notfound')
-    def notfound():
-        return 'notfound'
+        @app.route('/notfound')
+        def notfound():
+            return 'notfound'
 
-    return app
+        return app

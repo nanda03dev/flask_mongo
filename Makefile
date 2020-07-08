@@ -1,5 +1,4 @@
 FLASK_APP = book_app
-# FLASK_ENV := development
 FLASK_DEBUG := 1
 FLASK_RUN_PORT := 5000
 
