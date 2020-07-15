@@ -4,16 +4,18 @@ from flask import Flask
 from .database import mongo_db
 from os.path import join, dirname, realpath
 UPLOAD_FOLDER = 'uploads'
-UPLOADS_PATH = join(dirname(realpath(__file__)), UPLOAD_FOLDER)
+UPLOAD_PATH = join(dirname(realpath(__file__)), UPLOAD_FOLDER)
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY='dev',
-        UPLOAD_FOLDER = UPLOADS_PATH,
-        ALLOWED_EXTENSIONS = ALLOWED_EXTENSIONS
+        UPLOAD_FOLDER = UPLOAD_PATH,
+        ALLOWED_EXTENSIONS = ALLOWED_EXTENSIONS,
+        MAX_CONTENT_LENGTH = MAX_CONTENT_LENGTH
     )
 
     if test_config is None:
